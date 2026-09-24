@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Promissory Estoppel — Contracts Practice Set</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c2a3a; --paper:#f1ece1; --paper2:#e6ddc9; --line:#c9bfa6;
+  --accent:#7a2e2e; --accent2:#a8823a; --correct:#3c6e47; --incorrect:#8c3b3b;
+  --text:#2a2a26; --muted:#6b6558; --card:#faf7ef;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e9e4d6; --paper:#161d27; --paper2:#1f2735; --line:#3a4658;
+    --accent:#d98888; --accent2:#d3ac66; --correct:#7fbf8f; --incorrect:#e08a8a;
+    --text:#e9e4d6; --muted:#9aa2ad; --card:#1c2431;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e9e4d6; --paper:#161d27; --paper2:#1f2735; --line:#3a4658;
+  --accent:#d98888; --accent2:#d3ac66; --correct:#7fbf8f; --incorrect:#e08a8a;
+  --text:#e9e4d6; --muted:#9aa2ad; --card:#1c2431;
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{
+  margin:0; background:var(--paper); color:var(--text);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  min-height:100%; line-height:1.55;
+}
+.wrap{max-width:680px; margin:0 auto; padding:2.75rem 1.25rem 4rem;}
+header.hero{margin-bottom:2rem;}
+.kicker{font-size:.8rem; color:var(--muted); letter-spacing:.02em;}
+h1{
+  font-family:'Spectral',Georgia,serif; font-weight:600; font-size:2.15rem;
+  margin:.2rem 0 .35rem; color:var(--ink); line-height:1.15;
+}
+.rule{height:3px; width:64px; background:var(--accent); margin:.9rem 0 1rem; border-radius:1px;}
+.dek{color:var(--muted); font-size:.98rem; max-width:52ch;}
+nav.tabs{display:flex; gap:1.6rem; border-bottom:1px solid var(--line); margin:2rem 0 1.75rem;}
+nav.tabs button{
+  background:none; border:none; font-family:'Inter',sans-serif; font-size:.95rem; font-weight:600;
+  color:var(--muted); padding:0 0 .7rem; cursor:pointer; border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+}
+nav.tabs button.active{color:var(--ink); border-bottom-color:var(--accent);}
+section{display:none;}
+section.active{display:block;}
+
+/* MCQ */
+.progress-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.6rem;}
+.progress-label{font-size:.85rem; color:var(--muted);}
+.progress-track{height:4px; background:var(--paper2); border-radius:2px; overflow:hidden; margin-bottom:1.9rem;}
+.progress-fill{height:100%; background:var(--accent2); transition:width .25s ease;}
+.qcard{background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1.5rem 1.5rem 1.4rem;}
+.qnum{font-family:'Spectral',serif; font-size:.85rem; color:var(--accent2); font-weight:600;}
+.qtext{font-family:'Spectral',serif; font-size:1.18rem; font-weight:500; color:var(--ink); margin:.4rem 0 1.2rem; line-height:1.4;}
+.opt{
+  display:flex; gap:.75rem; align-items:flex-start; padding:.7rem .75rem; border-left:3px solid var(--line);
+  margin-bottom:.5rem; cursor:pointer; border-radius:0 4px 4px 0; transition:border-color .15s, background .15s;
+}
+.opt:hover{background:var(--paper2);}
+.opt input{margin-top:.25rem;}
+.opt.selected{border-left-color:var(--accent2); background:var(--paper2);}
+.opt.correct{border-left-color:var(--correct); background:color-mix(in srgb, var(--correct) 12%, var(--card));}
+.opt.incorrect{border-left-color:var(--incorrect); background:color-mix(in srgb, var(--incorrect) 12%, var(--card));}
+.opt-letter{font-weight:600; color:var(--muted); font-size:.85rem; min-width:1.1rem;}
+.feedback{margin-top:1rem; padding:.9rem 1rem; border-radius:4px; font-size:.92rem; display:none;}
+.feedback.show{display:block;}
+.feedback.right{background:color-mix(in srgb, var(--correct) 14%, var(--card)); color:var(--correct);}
+.feedback.wrong{background:color-mix(in srgb, var(--incorrect) 14%, var(--card)); color:var(--incorrect);}
+.feedback .expl{color:var(--text); margin-top:.4rem; font-size:.9rem; opacity:.9;}
+.btn-row{display:flex; justify-content:flex-end; margin-top:1.4rem; gap:.6rem;}
+button.primary{
+  background:var(--ink); color:var(--paper); border:none; padding:.6rem 1.25rem; border-radius:4px;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:.9rem; cursor:pointer;
+}
+button.primary:disabled{opacity:.4; cursor:not-allowed;}
+button.ghost{
+  background:none; border:1px solid var(--line); color:var(--text); padding:.6rem 1.1rem; border-radius:4px;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:.9rem; cursor:pointer;
+}
+.results{text-align:center; padding:2rem 1rem;}
+.score{font-family:'Spectral',serif; font-size:3rem; color:var(--ink); font-weight:600;}
+.score-label{color:var(--muted); font-size:.95rem; margin-top:.2rem;}
+.review-list{text-align:left; margin-top:2rem; border-top:1px solid var(--line); padding-top:1.25rem;}
+.review-item{padding:.6rem 0; border-bottom:1px solid var(--line); font-size:.92rem;}
+.review-item .tag{font-weight:600; font-size:.78rem;}
+.tag.right{color:var(--correct);} .tag.wrong{color:var(--incorrect);}
+
+/* Short answer */
+.sa-card{background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1.5rem; margin-bottom:1.75rem;}
+.sa-prompt{font-family:'Spectral',serif; font-size:1.1rem; color:var(--ink); margin:.4rem 0 1rem; line-height:1.45;}
+textarea{
+  width:100%; min-height:120px; background:var(--paper); color:var(--text); border:1px solid var(--line);
+  border-radius:4px; padding:.75rem; font-family:'Inter',sans-serif; font-size:.92rem; resize:vertical;
+}
+.reveal{margin-top:1rem; padding:1rem 1.1rem; background:var(--paper2); border-radius:4px; font-size:.9rem; display:none;}
+.reveal.show{display:block;}
+.reveal h4{margin:0 0 .5rem; font-family:'Spectral',serif; font-size:.95rem; color:var(--accent2);}
+.reveal ul{margin:.3rem 0 0; padding-left:1.1rem;}
+.reveal li{margin-bottom:.35rem;}
+footer.note{margin-top:2.5rem; font-size:.8rem; color:var(--muted); text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">1L Contracts — Practice Set</div>
+    <h1>Promissory Estoppel</h1>
+    <div class="rule"></div>
+    <p class="dek">10 multiple-choice questions and 1 essay question, drawn from your outline (the pension hypothetical and Alaska Democratic Party v. Rice, 934 P.2d 1313 (Alaska 1997)) plus a full practice hypothetical with instructor answer key.</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="active" data-tab="mcq">Multiple Choice</button>
+    <button data-tab="sa">Essay Question</button>
+  </nav>
+
+  <section id="mcq" class="active">
+    <div class="progress-row">
+      <span class="progress-label" id="progLabel">Question 1 of 10</span>
+      <span class="progress-label" id="progScore"></span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progFill" style="width:10%"></div></div>
+    <div id="quizArea"></div>
+  </section>
+
+  <section id="sa">
+    <div id="saArea"></div>
+  </section>
+
+  <footer class="note">Built from your Contracts outline. Answers you select are not stored or sent anywhere.</footer>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "What is the primary purpose of promissory estoppel as a doctrine?",
+    options: [
+      "To interpret ambiguous contract terms using extrinsic evidence",
+      "To enforce a promise that induced reliance, even without traditional consideration",
+      "To determine whether the UCC or common law governs a mixed contract",
+      "To imply a duty of good faith into every contract"
+    ],
+    correct: 1,
+    expl: "Restatement §90 lets a court enforce a promise absent bargained-for consideration where the promisee reasonably and foreseeably relied on it, and injustice can only be avoided by enforcement."
+  },
+  {
+    q: "Under Restatement (Second) of Contracts §90, which of the following is NOT a required element?",
+    options: [
+      "A promise the promisor should reasonably expect to induce reliance",
+      "Actual reliance by the promisee (or a third person)",
+      "Payment of a nominal sum to formalize the promise",
+      "Injustice can be avoided only by enforcing the promise"
+    ],
+    correct: 2,
+    expl: "PE substitutes for consideration entirely — no payment or bargained-for exchange is required. That's what distinguishes it from an ordinary contract."
+  },
+  {
+    q: "In the Alliance pension hypothetical (Problem 3-5), why did the promissory estoppel claim fail?",
+    options: [
+      "There was no promise at all",
+      "The promisee could not show any change in his position in reliance on the promise",
+      "The promise was for past services, which independently defeats any §90 claim",
+      "The company was not a merchant under the UCC"
+    ],
+    correct: 1,
+    expl: "Per your notes: 'There is no evidence of any change in Buck's actions in relation to the promise.' The promise (the $7,500/month letter) existed — reliance was the missing element."
+  },
+  {
+    q: "Alaska Democratic Party v. Rice, 934 P.2d 1313 (Alaska 1997), illustrates promissory estoppel being used to:",
+    options: [
+      "Void a contract for lack of mutual assent",
+      "Overcome a Statute of Frauds defense to an oral multi-year employment agreement",
+      "Establish an implied warranty of merchantability",
+      "Set an open price term under UCC § 2-305"
+    ],
+    correct: 1,
+    expl: "Party chair Wakefield orally offered Rice a two-year executive director position at $36,000/year. She resigned her Maryland job and moved to Alaska in reliance, but no written contract existed. When the Party's executive committee blocked the hire, Rice sued, and the Alaska Supreme Court held PE could enforce the oral promise despite the Statute of Frauds."
+  },
+  {
+    q: "When PE is used to defeat a Statute of Frauds defense, courts typically require:",
+    options: [
+      "A lower 'preponderance of the evidence' standard",
+      "A heightened 'clear and convincing evidence' standard as to promise, reliance, and foreseeability",
+      "A signed writing regardless of any reliance shown",
+      "Proof that the agreement involves the sale of goods"
+    ],
+    correct: 1,
+    expl: "Because PE here bypasses a statutory writing requirement, courts raise the bar: clear and convincing evidence of the promise, reasonable reliance, and foreseeability, rather than ordinary preponderance."
+  },
+  {
+    q: "Promissory estoppel is best understood doctrinally as:",
+    options: [
+      "A type of contract requiring offer, acceptance, and consideration",
+      "A substitute for consideration that makes an otherwise unenforceable promise enforceable",
+      "A remedy available only in tort claims",
+      "A canon of contract construction"
+    ],
+    correct: 1,
+    expl: "PE doesn't require a bargained-for exchange; reliance does the work consideration would otherwise do."
+  },
+  {
+    q: "The remedy available on a successful §90 claim is:",
+    options: [
+      "Always full expectation damages",
+      "Always specific performance",
+      "Whatever the court finds necessary to avoid injustice — which may be less than full expectation damages",
+      "Punitive damages only"
+    ],
+    correct: 2,
+    expl: "Restatement §90(1) expressly states the remedy 'may be limited as justice requires' — often reliance damages rather than the full benefit of the bargain."
+  },
+  {
+    q: "A classic application of PE to 'options and offeree reliance' involves:",
+    options: [
+      "A general contractor relying on a subcontractor's bid in submitting its own bid, making the sub's bid temporarily irrevocable",
+      "A merchant's firm offer under UCC § 2-205",
+      "A buyer rejecting nonconforming goods under the perfect tender rule",
+      "A seller disclaiming implied warranties 'as is'"
+    ],
+    correct: 0,
+    expl: "This is the bid-reliance line of cases: the general contractor's foreseeable reliance on a sub's bid can make that bid temporarily irrevocable under §90, distinct from a UCC firm offer, which requires only a signed writing by a merchant — no reliance needed."
+  },
+  {
+    q: "Which fact pattern is LEAST likely to satisfy the 'foreseeability' element of PE?",
+    options: [
+      "An employer promises a specific pension amount to an employee who then quits a stable job to accept it",
+      "A landowner tells a stranger he 'might' consider selling someday, with nothing suggesting the stranger would act on it",
+      "A distributor is promised exclusive territory and invests in a warehouse in reliance",
+      "A subcontractor's bid is relied on by a general contractor preparing a public bid"
+    ],
+    correct: 1,
+    expl: "Vague, non-committal language gives the promisor no reason to expect anyone would act in reliance on it — foreseeability fails."
+  },
+  {
+    q: "How does promissory estoppel relate to traditional bargained-for consideration?",
+    options: [
+      "They are the same doctrine under different names",
+      "PE requires MORE proof than consideration does",
+      "PE is an alternative basis for enforcing a promise when consideration is absent",
+      "PE applies only to sale-of-goods contracts under the UCC"
+    ],
+    correct: 2,
+    expl: "PE exists precisely to enforce promises that fail for lack of consideration, where reliance makes enforcement equitable instead."
+  }
+];
+
+const essay = {
+  facts: [
+    "Mary and Bob Pincay obtained a $250,000 mortgage on their home from Southeast Bank (\u201cSoutheast\u201d) in August 2001. The mortgage agreement required the Pincays to \u201ccarry insurance\u201d on the property until the mortgage was paid off. The Pincays obtained homeowners' insurance that same month.",
+    "The Pincays let the insurance lapse effective January 1, 2004. Southeast sent a letter dated January 5, 2004 (received January 7) informing them their insurance had expired and that if they did not purchase a new policy, Southeast \u201cmight be forced to purchase [insurance] and add the premium to [their] loan balance.\u201d",
+    "On January 15, 2004, a Southeast representative called Mary and said that if the Pincays did not obtain insurance, \u201cit is the bank's standard practice to purchase insurance for debtors\u201d like them and add the premium to the mortgage balance. Mary replied: \u201cgo ahead and buy the insurance; I don't think we can afford to pay for it.\u201d The rep answered: \u201clike I said, in these cases, we buy the insurance for the borrower and charge you on your monthly statement.\u201d",
+    "Based on the letter and the call, the Pincays believed Southeast would obtain insurance on their home and had no further contact with the bank about it. They believed they were paying for the insurance as part of their monthly mortgage payment. Southeast did obtain insurance for the Pincays in February 2004 \u2014 but let that policy lapse on December 31, 2004. As of January 1, 2005, the house had no insurance. On July 10, 2005, the house burned down, and the Pincays only then learned they had no coverage."
+  ],
+  question: "Assume all of the facts above are true. Can the Pincays recover against Southeast Bank under promissory estoppel? Analyze each element \u2014 Promise, Foreseeability, Reliance, and Injustice \u2014 and consider the arguments each side could make on each element.",
+  framework: "Elements: (1) Promise, (2) Foreseeability, (3) Reliance, (4) Injustice. Don't forget there are sub-rules under promise, two sub-elements to reliance, and several factors relevant to injustice.",
+  elements: [
+    {
+      title: "Element 1 — Promise",
+      points: [
+        "Against a promise: no words like \u201cpromise\u201d or \u201cassurance\u201d were used.",
+        "For a promise: one can be implied from the letter (\u201cmight be forced\u201d to buy insurance) and the call (\u201cstandard practice,\u201d \u201cin these cases\u201d).",
+        "Either conclusion on whether a promise existed can earn full credit.",
+        "Bank's additional argument (as in Acevedo/Aceves-line cases): even if a promise was made, the bank kept it \u2014 it did buy insurance, and never stated a duration.",
+        "Pincays' response: a promise to buy insurance implies the bank would notify them before stopping, since the mortgage required insurance for the life of the loan; an open-ended promise like this only makes sense as ongoing.",
+        "Better conclusion: the bank's duration argument fails (full credit); partial credit for concluding the bank wins on that point."
+      ]
+    },
+    {
+      title: "Element 2 — Foreseeability",
+      points: [
+        "The bank said buying insurance for debtors like them was its \u201cstandard practice\u201d \u2014 why would the Pincays buy their own insurance after hearing that?",
+        "More importantly, Mary explicitly said \u201cgo ahead and buy it.\u201d Once she said that, the bank should have foreseen the Pincays would rely and not obtain their own coverage.",
+        "Conclusion: this element is met."
+      ]
+    },
+    {
+      title: "Element 3 — Reliance",
+      points: [
+        "3a. Action or forbearance: the Pincays did not buy insurance \u2014 that is forbearance.",
+        "3b. Because of the promise: could go either way. They told the bank to \u201cgo ahead\u201d right after the bank's statement, suggesting the promise caused the forbearance. But Mary also said she didn't think they could afford it \u2014 suggesting cost, not the promise, drove the decision.",
+        "Counter: the bank's assurances could have lulled the Pincays into not making a more concerted effort to find the money \u2014 Mary said she didn't \u201cthink\u201d they could pay, not that there was no chance.",
+        "Either conclusion on whether reliance was because of the promise can earn full credit."
+      ]
+    },
+    {
+      title: "Element 4 — Injustice (five factors)",
+      points: [
+        "Extent of reliance: significant \u2014 they didn't buy insurance and lost their house. Strongly pro-Pincay.",
+        "Reasonableness of reliance: the bank said this was its standard practice, giving the Pincays no reason to distrust it. Pro-Pincay.",
+        "Formality: the promise (if any) was repeated and partly in writing, but also partly implied \u2014 cuts both ways, slightly favoring the bank.",
+        "Did the reliance benefit the promisor: no \u2014 the bank gained nothing from the Pincays' forbearance; it had to buy insurance itself and risked losing the value of its collateral if it failed to do so.",
+        "Anything else: no major additional facts, though a responsible bank arguably should have given notice before letting the second policy lapse \u2014 worth some credit as a creative argument.",
+        "Conclusion: the first two factors strongly support the Pincays and outweigh the third; the fourth doesn't move the needle much. Full credit for concluding justice demands enforcement; partial credit for the opposite conclusion."
+      ]
+    },
+    {
+      title: "Final Conclusion",
+      points: [
+        "Element 1 (promise) and Element 3b (causation) are genuine toss-ups \u2014 full credit is available on either side of each.",
+        "What matters for credit is the thoroughness of the element-by-element analysis and consideration of both sides' arguments, not which final answer you reach."
+      ]
+    }
+  ]
+};
+
+let current = 0, answered = [], score = 0;
+
+function renderQuiz(){
+  const q = questions[current];
+  const area = document.getElementById('quizArea');
+  const state = answered[current];
+  document.getElementById('progLabel').textContent = `Question ${current+1} of ${questions.length}`;
+  document.getElementById('progFill').style.width = `${((current+1)/questions.length)*100}%`;
+  document.getElementById('progScore').textContent = current > 0 || state !== undefined ? `Score: ${score}/${answered.filter(a=>a!==undefined).length}` : '';
+
+  let html = `<div class="qcard"><div class="qnum">No. ${current+1}</div><div class="qtext">${q.q}</div>`;
+  q.options.forEach((opt, i) => {
+    let cls = 'opt';
+    if(state !== undefined){
+      if(i === q.correct) cls += ' correct';
+      else if(i === state) cls += ' incorrect';
+    } else if (state === i){
+      cls += ' selected';
+    }
+    html += `<div class="${cls}" data-i="${i}" onclick="selectOption(${i})">
+      <span class="opt-letter">${String.fromCharCode(65+i)}</span><span>${opt}</span>
+    </div>`;
+  });
+  if(state !== undefined){
+    const right = state === q.correct;
+    html += `<div class="feedback show ${right?'right':'wrong'}">
+      ${right ? 'Correct.' : 'Not quite.'} <div class="expl">${q.expl}</div></div>`;
+  }
+  html += `<div class="btn-row">`;
+  if(current > 0) html += `<button class="ghost" onclick="prevQ()">Back</button>`;
+  if(current < questions.length - 1){
+    html += `<button class="primary" ${state===undefined?'disabled':''} onclick="nextQ()">Next</button>`;
+  } else {
+    html += `<button class="primary" ${state===undefined?'disabled':''} onclick="showResults()">See results</button>`;
+  }
+  html += `</div></div>`;
+  area.innerHTML = html;
+}
+
+function selectOption(i){
+  if(answered[current] !== undefined) return;
+  const q = questions[current];
+  answered[current] = i;
+  if(i === q.correct) score++;
+  renderQuiz();
+}
+function nextQ(){ current++; renderQuiz(); }
+function prevQ(){ current--; renderQuiz(); }
+
+function showResults(){
+  const area = document.getElementById('quizArea');
+  document.getElementById('progFill').style.width = '100%';
+  document.getElementById('progLabel').textContent = 'Complete';
+  document.getElementById('progScore').textContent = '';
+  let html = `<div class="results"><div class="score">${score}/${questions.length}</div>
+    <div class="score-label">correct</div>
+    <div class="btn-row" style="justify-content:center;"><button class="ghost" onclick="restart()">Retake quiz</button></div>
+    <div class="review-list">`;
+  questions.forEach((q, i) => {
+    const right = answered[i] === q.correct;
+    html += `<div class="review-item"><span class="tag ${right?'right':'wrong'}">${right?'Correct':'Missed'}</span> — ${q.q}</div>`;
+  });
+  html += `</div></div>`;
+  area.innerHTML = html;
+}
+function restart(){ current = 0; answered = []; score = 0; renderQuiz(); }
+
+function renderSA(){
+  const area = document.getElementById('saArea');
+  let html = `<div class="sa-card">
+    <div class="qnum">Practice Hypothetical</div>
+    <div class="sa-prompt" style="font-size:1rem; font-weight:400;">${essay.facts.map(p=>`<p style="margin:0 0 .85rem;">${p}</p>`).join('')}</div>
+    <div class="sa-prompt">${essay.question}</div>
+    <p style="font-size:.85rem; color:var(--muted); margin:-.5rem 0 1.1rem;">${essay.framework}</p>
+    <textarea placeholder="Draft your answer here..." id="sa-0"></textarea>
+    <div class="btn-row" style="justify-content:flex-start;">
+      <button class="ghost" onclick="toggleReveal(0)">Show answer key</button>
+    </div>
+    <div class="reveal" id="reveal-0">
+      ${essay.elements.map(el => `
+        <h4>${el.title}</h4>
+        <ul>${el.points.map(p=>`<li>${p}</li>`).join('')}</ul>
+      `).join('')}
+    </div>
+  </div>`;
+  area.innerHTML = html;
+}
+function toggleReveal(i){
+  document.getElementById(`reveal-${i}`).classList.toggle('show');
+}
+
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+renderQuiz();
+renderSA();
+</script>
+</body>
+</html>
